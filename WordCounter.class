@@ -1,0 +1,89 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
+
+public class WordCounter {
+    public static void main(String[] arg) throws IOException{
+        Map<String, Integer> counts = new HashMap<String,Integer>();
+        int idx0 = 0;
+        File file = new File("C:/input.txt");
+        // Modify to accept file input here
+        FileReader fr = new FileReader(file);
+        BufferedReader textReader = new BufferedReader(fr);
+        // get number of lines!  
+          int numLines = 0;
+           String thisLine = textReader.readLine();
+    	   while (thisLine != null){
+    	        numLines++;
+                //System.out.println(thisLine);
+                String input = thisLine;
+                // Split into 4 columns, 4th column (or 3rd index) is one we need
+                String [] ColSplit = input.split("\\t");
+                if(ColSplit[3] != null) {
+                String [] searchTerms = ColSplit[3].split(" ");
+                // System.out.println("LINE " + numLines);
+                for(int i = 0; i<searchTerms.length; i++) {
+                    //System.out.println(searchTerms[i]);
+                    // Counts
+                    // See if word is on list...
+                    Integer count = counts.get(searchTerms[i]);
+                    if(count == null)    {
+                        counts.put(searchTerms[i], 1);
+                    } else {
+                        counts.put(searchTerms[i], count+1);
+                    }
+                }
+                thisLine = textReader.readLine();
+                }
+    	   }
+        textReader.close();
+
+        Map.Entry<String, Integer>[] entries = counts.entrySet().toArray(new Map.Entry[0]);
+        Arrays.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+ 
+        File outfile = new File("C:/Users/Mike/WordCounts.txt");
+ 
+	// if file doesnt exist create it
+	if (!outfile.exists()) {
+            outfile.createNewFile();
+	}
+ 
+	FileWriter fw = new FileWriter(outfile.getAbsoluteFile());
+	BufferedWriter bw = new BufferedWriter(fw);
+	
+        int rank=1;
+        System.out.println("Rank Freq Phrase");
+        bw.write("Rank Freq Phrase");
+        bw.newLine();
+        for(Map.Entry<String,Integer> entry:entries){
+            int count = entry.getValue();
+            if(count>1){
+                String output = rank + "\t" + count + "\t" + entry.getKey();
+                System.out.printf("%4d %4d %s\n", rank++, count,entry.getKey());
+                //System.out.printf(output);
+                try {
+                    bw.write(output);
+                    bw.newLine();
+                }catch(IOException e)   {
+                    e.printStackTrace();
+                }
+            }
+        }
+        bw.close();
+ 
+	System.out.println("Done");
+    }
+}
